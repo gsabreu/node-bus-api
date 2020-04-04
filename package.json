@@ -7,7 +7,8 @@
   "license": "ISC",
   "scripts": {
     "test": "jest --watchAll --silent --noStackTrace",
-    "test:staged": "jest --passWithNoTests --findRelatedTests --silent"
+    "test:staged": "jest --passWithNoTests --findRelatedTests --silent",
+    "test:ci": "jest --coverage"
   },
   "standard": {
     "env": [
