@@ -3,17 +3,17 @@
   "version": "0.0.1",
   "description": "SPtrans bus API",
   "main": "index.js",
+  "author": "Guilherme Abreu",
+  "license": "ISC",
   "scripts": {
-    "test": "jest --watchAll",
-    "test:staged": "jest --passWithNoTests"
+    "test": "jest --watchAll --silent --noStackTrace",
+    "test:staged": "jest --passWithNoTests --findRelatedTests --silent"
   },
   "standard": {
     "env": [
       "jest"
     ]
   },
-  "author": "Guilherme Abreu",
-  "license": "ISC",
   "devDependencies": {
     "husky": "^4.2.3",
     "jest": "^25.2.7",
