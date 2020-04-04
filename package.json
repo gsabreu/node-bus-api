@@ -8,12 +8,12 @@
   },
   "lint-staged": {
     "*.js": [
-      "standard --fix", 
+      "standard --fix",
       "git add"
     ]
   },
   "husky": {
-    "hooks" :{
+    "hooks": {
       "pre-commit": "lint-staged"
     }
   },
@@ -21,6 +21,7 @@
   "license": "ISC",
   "devDependencies": {
     "husky": "^4.2.3",
+    "jest": "^25.2.7",
     "lint-staged": "^10.1.1",
     "standard": "^14.3.3"
   }
