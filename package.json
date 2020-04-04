@@ -3,13 +3,25 @@
   "version": "0.0.1",
   "description": "SPtrans bus API",
   "main": "index.js",
-  "dependencies": {
-    "express": "^4.17.1"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "lint-staged": {
+    "*.js": [
+      "standard --fix", 
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks" :{
+      "pre-commit": "lint-staged"
+    }
+  },
   "author": "Guilherme Abreu",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^4.2.3",
+    "lint-staged": "^10.1.1",
+    "standard": "^14.3.3"
+  }
 }
