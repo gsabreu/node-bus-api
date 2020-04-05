@@ -13,6 +13,15 @@ const createTokenGeneratorSpy = () => {
   return tokenGeneratorSpy
 }
 
+const createTokenGeneratorSpyWithError = () => {
+  class TokenGeneratorSpy {
+    async generate () {
+      throw new Error()
+    }
+  }
+  return new TokenGeneratorSpy()
+}
+
 const createEncrypterSpy = () => {
   class EncrypterSpy {
     async compare (password, hashedPassword) {
@@ -24,6 +33,15 @@ const createEncrypterSpy = () => {
   const encrypterSpy = new EncrypterSpy()
   encrypterSpy.isValid = true
   return encrypterSpy
+}
+
+const createEncrypterSpyWithError = () => {
+  class EncrypterSpy {
+    async compare () {
+      throw new Error()
+    }
+  }
+  return new EncrypterSpy()
 }
 
 const createLoadUserByEmailRepositorySpy = () => {
@@ -39,6 +57,15 @@ const createLoadUserByEmailRepositorySpy = () => {
     password: 'hashed_password'
   }
   return loadUserByEmailRepositorySpy
+}
+
+const createLoadUserByEmailRepositorySpyWithError = () => {
+  class LoadUserByEmailRepositorySpy {
+    async load () {
+      throw new Error()
+    }
+  }
+  return new LoadUserByEmailRepositorySpy()
 }
 
 const createSut = () => {
@@ -128,6 +155,30 @@ describe('Auth UseCase', () => {
         loadUserByEmailRepository,
         encrypter,
         tokenGenerator: {}
+      })
+    )
+    for (const sut of suts) {
+      const promise = sut.auth('any_email@mail.com', 'any_password')
+      expect(promise).rejects.toThrow()
+    }
+  })
+
+  test('Should throw if dependencies throws', async () => {
+    const loadUserByEmailRepository = createLoadUserByEmailRepositorySpy()
+    const encrypter = createEncrypterSpy()
+    const suts = [].concat(
+      new AuthUseCase({
+        loadUserByEmailRepository: createLoadUserByEmailRepositorySpyWithError()
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter: createEncrypterSpyWithError()
+      })
+      ,
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter,
+        tokenGenerator: createTokenGeneratorSpyWithError()
       })
     )
     for (const sut of suts) {
