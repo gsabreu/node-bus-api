@@ -27,9 +27,14 @@ describe('Token Generator', () => {
     expect(jwt.secret).toBe(sut.secret)
   })
 
-  test('Should throw if  secret arent provided', async () => {
+  test('Should throw if  secret isnt provided', async () => {
     const sut = new TokenGenerator()
     const promise = sut.generate('any_id')
     expect(promise).rejects.toThrow(new MissingParamError('secret'))
+  })
+  test('Should throw if id isnt provided', async () => {
+    const sut = createSut()
+    const promise = sut.generate()
+    expect(promise).rejects.toThrow(new MissingParamError('id'))
   })
 })
