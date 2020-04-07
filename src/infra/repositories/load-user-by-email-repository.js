@@ -1,3 +1,5 @@
+const MissingParamError = require('../../utils/errors/missing-param-error')
+
 module.exports = class LoadUserByEmailRepository {
   constructor (userModel) {
     this.userModel = userModel
@@ -10,6 +12,9 @@ module.exports = class LoadUserByEmailRepository {
           password: 1
         }
       })
+    if (!email) {
+      throw new MissingParamError('email')
+    }
     return user
   }
 }
