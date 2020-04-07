@@ -1,21 +1,7 @@
-const { MongoClient } = require('mongodb')
-class LoadUserByEmailRepository {
-  constructor (userModel) {
-    this.userModel = userModel
-  }
+const MongoHelper = require('../helpers/mongo-helper')
+const LoadUserByEmailRepository = require('./load-user-by-email-repository')
 
-  async load (email) {
-    const user = await this.userModel.findOne(
-      { email }, {
-        projection: {
-          password: 1
-        }
-      })
-    return user
-  }
-}
-
-let client, db
+let db
 
 const createSut = () => {
   const userModel = db.collection('users')
@@ -25,11 +11,8 @@ const createSut = () => {
 
 describe('LoadUserByEmailRepository', () => {
   beforeAll(async () => {
-    client = await MongoClient.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
-    db = await client.db()
+    await MongoHelper.connect(process.env.MONGO_URL)
+    db = await MongoHelper.getDb()
   })
 
   beforeEach(async () => {
@@ -37,7 +20,7 @@ describe('LoadUserByEmailRepository', () => {
   })
 
   afterAll(async () => {
-    await client.close()
+    await MongoHelper.close
   })
 
   test('Should return null if no user is found ', async () => {
@@ -60,5 +43,11 @@ describe('LoadUserByEmailRepository', () => {
       _id: fakeUser.ops[0]._id,
       password: fakeUser.ops[0].password
     })
+  })
+
+  test('Should throw if userModel isnt provided ', async () => {
+    const sut = new LoadUserByEmailRepository()
+    const promise = sut.load('any_email@gmail.com')
+    expect(promise).rejects.toThrow()
   })
 })
