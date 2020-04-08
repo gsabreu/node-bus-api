@@ -2,10 +2,11 @@
   "name": "bus-api",
   "version": "0.0.1",
   "description": "SPtrans bus API",
-  "main": "index.js",
   "author": "Guilherme Abreu",
   "license": "ISC",
+  "main": "src/main/index.js",
   "scripts": {
+    "start": "node src/main/index.js",
     "test": "jest --colors --noStackTrace --passWithNoTests",
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "bcrypt": "^4.0.1",
+    "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
     "validator": "^13.0.0"
