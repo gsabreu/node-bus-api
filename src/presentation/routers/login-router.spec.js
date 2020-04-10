@@ -148,21 +148,6 @@ describe('Login Router', () => {
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
   })
 
-  test('Should return 500 if EmailValidator throws', async () => {
-    const authUseCaseSpy = createAuthUseCaseError(createAuthUseCase(), createEmailValidatorError())
-
-    const sut = new LoginRouter(authUseCaseSpy)
-    const httpRequest = {
-      body: {
-        email: 'any_email',
-        password: 'password'
-      }
-    }
-    const httpResponse = await sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
-  })
-
   test('Should call EmailValidor with correct email', async () => {
     const { sut, emailValidatorSpy } = createSut()
     const httpRequest = {
@@ -175,7 +160,7 @@ describe('Login Router', () => {
     expect(emailValidatorSpy.email).toBe(httpRequest.body.email)
   })
 
-  test('Should throw if dependencies throws', async () => {
+  test('Should throw if invalid dependencies are provided', async () => {
     const invalid = {}
     const authUseCase = createAuthUseCase()
 
@@ -192,6 +177,30 @@ describe('Login Router', () => {
         authUseCase: authUseCase,
         emailValidator: invalid
       }))
+    for (const sut of suts) {
+      const httpRequest = {
+        body: {
+          email: 'any_email',
+          password: 'password'
+        }
+      }
+      const httpResponse = await sut.route(httpRequest)
+      expect(httpResponse.statusCode).toBe(500)
+      expect(httpResponse.body).toEqual(new ServerError())
+    }
+  })
+
+  test('Should throw if dependencies throws', async () => {
+    const authUseCase = createAuthUseCase()
+    const suts = [].concat(
+      new LoginRouter({
+        authUseCase: createAuthUseCaseError()
+      }),
+      new LoginRouter({
+        authUseCase: authUseCase,
+        emailValidator: createEmailValidatorError()
+      })
+    )
     for (const sut of suts) {
       const httpRequest = {
         body: {
