@@ -5,7 +5,10 @@ const { MissingParamError, InvalidParamError } = require('../../utils/errors')
 const createSut = () => {
   const authUseCaseSpy = createAuthUseCase()
   const emailValidatorSpy = createEmailValidator()
-  const sut = new LoginRouter(authUseCaseSpy, emailValidatorSpy)
+  const sut = new LoginRouter({
+    authUseCase: authUseCaseSpy,
+    emailValidator: emailValidatorSpy
+  })
   return { sut, authUseCaseSpy, emailValidatorSpy }
 }
 
@@ -131,47 +134,6 @@ describe('Login Router', () => {
     expect(httpResponse.body.accessToken).toEqual(authUseCaseSpy.accessToken)
   })
 
-  test('Should return 500 if AuthUseCase isnt provided', async () => {
-    const sut = new LoginRouter()
-    const httpRequest = {
-      body: {
-        email: 'invalid_email@mail.com',
-        password: 'invalid_password'
-      }
-    }
-    const httpResponse = await sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
-  })
-
-  test('Should return 500 if AuthUseCase hasnt method auth', async () => {
-    const sut = new LoginRouter({})
-    const httpRequest = {
-      body: {
-        email: 'any_email',
-        password: 'password'
-      }
-    }
-    const httpResponse = await sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
-  })
-
-  test('Should return 500 if AuthUseCase throws', async () => {
-    const authUseCaseSpy = createAuthUseCaseError()
-
-    const sut = new LoginRouter(authUseCaseSpy)
-    const httpRequest = {
-      body: {
-        email: 'any_email',
-        password: 'password'
-      }
-    }
-    const httpResponse = await sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
-  })
-
   test('Should return 400 if invalid email is provided', async () => {
     const { sut, emailValidatorSpy } = createSut()
     emailValidatorSpy.isEmailValid = false
@@ -184,32 +146,6 @@ describe('Login Router', () => {
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
-  })
-
-  test('Should return 500 if EmailValidator isnt provided', async () => {
-    const sut = new LoginRouter(createAuthUseCase())
-    const httpRequest = {
-      body: {
-        email: 'invalid_email@mail.com',
-        password: 'invalid_password'
-      }
-    }
-    const httpResponse = await sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
-  })
-
-  test('Should return 500 if EmailValidator hasnt isValid Method', async () => {
-    const sut = new LoginRouter(createAuthUseCase(), {})
-    const httpRequest = {
-      body: {
-        email: 'invalid_email@mail.com',
-        password: 'invalid_password'
-      }
-    }
-    const httpResponse = await sut.route(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 500 if EmailValidator throws', async () => {
@@ -237,5 +173,35 @@ describe('Login Router', () => {
     }
     await sut.route(httpRequest)
     expect(emailValidatorSpy.email).toBe(httpRequest.body.email)
+  })
+
+  test('Should throw if dependencies throws', async () => {
+    const invalid = {}
+    const authUseCase = createAuthUseCase()
+
+    const suts = [].concat(
+      new LoginRouter(),
+      new LoginRouter({}),
+      new LoginRouter({
+        authUseCase: invalid
+      }),
+      new LoginRouter({
+        authUseCase: authUseCase
+      }),
+      new LoginRouter({
+        authUseCase: authUseCase,
+        emailValidator: invalid
+      }))
+    for (const sut of suts) {
+      const httpRequest = {
+        body: {
+          email: 'any_email',
+          password: 'password'
+        }
+      }
+      const httpResponse = await sut.route(httpRequest)
+      expect(httpResponse.statusCode).toBe(500)
+      expect(httpResponse.body).toEqual(new ServerError())
+    }
   })
 })
