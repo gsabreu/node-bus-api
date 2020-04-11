@@ -1,4 +1,4 @@
-const LoginValidator = require('../helpers/login-validator')
+const LoginValidator = require('../../../utils/helpers/login-validator')
 
 module.exports = class AuthUseCase {
   constructor ({ loadUserByEmailRepository, updateAccessTokenRepository, encrypter, tokenGenerator } = {}) {

@@ -1,4 +1,4 @@
-const { MissingParamError } = require('../../../utils/errors')
+const { MissingParamError } = require('../errors')
 const LoginValidator = require('./login-validator')
 
 describe('Login Validator', () => {

@@ -1,4 +1,4 @@
-const { MissingParamError } = require('../../../utils/errors')
+const { MissingParamError } = require('../errors')
 
 module.exports = class LoginValidator {
   static validateParams (email, password) {
