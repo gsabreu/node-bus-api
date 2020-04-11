@@ -1,4 +1,4 @@
-const { MissingParamError } = require('../../utils/errors')
+const LoginValidator = require('../helpers/login-validator')
 
 module.exports = class AuthUseCase {
   constructor ({ loadUserByEmailRepository, updateAccessTokenRepository, encrypter, tokenGenerator } = {}) {
@@ -9,12 +9,7 @@ module.exports = class AuthUseCase {
   }
 
   async auth (email, password) {
-    if (!email) {
-      throw new MissingParamError('email')
-    }
-    if (!password) {
-      throw new MissingParamError('password')
-    }
+    LoginValidator.validateParams(email, password)
 
     const user = await this.loadUserByEmailRepository.load(email)
     if (user && await this.encrypter.compare(password, user.password)) {

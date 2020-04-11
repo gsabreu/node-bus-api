@@ -1,5 +1,5 @@
 const AuthUseCase = require('./auth-usecase')
-const { MissingParamError } = require('../../utils/errors')
+const { MissingParamError } = require('../../../utils/errors')
 
 const createUpdateAccessTokenRepositorySpy = () => {
   class UpdateAccessTokenRepositorySpy {
