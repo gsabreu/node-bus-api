@@ -25,7 +25,7 @@ module.exports = class CreateUserRouter {
         return HttpResponse.ok({ user })
       } catch (e) {
         if (e instanceof UserAlredyExists) {
-          return HttpResponse.badRequest(e.message)
+          return HttpResponse.badRequest(e)
         }
       }
     } catch (error) {

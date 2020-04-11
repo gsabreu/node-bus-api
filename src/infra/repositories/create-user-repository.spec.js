@@ -37,6 +37,5 @@ describe('Create User Repository', () => {
     const sut = createSut()
     const user = await sut.createUser('email@email.com', 'any_password')
     expect(user.email).toBe('email@email.com')
-    expect(user.password).toBe('any_password')
   })
 })

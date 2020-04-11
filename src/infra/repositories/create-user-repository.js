@@ -12,7 +12,10 @@ module.exports = class CreateUserRepository {
       password: password
     })
       .then(result => {
-        user = result.ops[0]
+        user = {
+          _id: result.ops[0]._id,
+          email: result.ops[0].email
+        }
       })
     return user
   }
