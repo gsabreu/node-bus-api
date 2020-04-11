@@ -13,12 +13,29 @@ const createLoadUserByEmailRepositorySpy = () => {
   return loadUserByEmailRepositorySpy
 }
 
+const createCreateUserRepositorySpy = () => {
+  class CreateUserRepositorySpy {
+    async createUser (email, password) {
+      this.email = email
+      this.password = password
+      return this.user
+    }
+  }
+  const createUserRepositorySpy = new CreateUserRepositorySpy()
+  createUserRepositorySpy.user = {
+    email: 'email@email.com'
+  }
+  return createUserRepositorySpy
+}
+
 const createSut = () => {
   const loadUserByEmailRepositorySpy = createLoadUserByEmailRepositorySpy()
+  const createUserRepositorySpy = createCreateUserRepositorySpy()
   const sut = new CreateUser({
-    loadUserByEmailRepository: loadUserByEmailRepositorySpy
+    loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+    createUserRepository: createUserRepositorySpy
   })
-  return { sut, loadUserByEmailRepositorySpy }
+  return { sut, loadUserByEmailRepositorySpy, createUserRepositorySpy }
 }
 
 describe('Create User Usecase', () => {
@@ -42,5 +59,36 @@ describe('Create User Usecase', () => {
     }
     const promise = sut.createUser('email@email.com', 'any_pass')
     expect(promise).rejects.toThrow(new UserAlredyExists('email@email.com'))
+  })
+
+  test('should return throw', async () => {
+    const { sut } = createSut()
+    const user = await sut.createUser('email@email.com', 'any_pass')
+    expect(user.email).toBe('email@email.com')
+  })
+
+  test('Should throw if invalid dependencies are provided', async () => {
+    const loadUserByEmailRepository = createLoadUserByEmailRepositorySpy()
+    const createUserRepository = createCreateUserRepositorySpy()
+    const suts = [].concat(
+      new CreateUser(),
+      new CreateUser({ loadUserByEmailRepository: null }),
+      new CreateUser({ loadUserByEmailRepository: {} }),
+      new CreateUser({
+        loadUserByEmailRepository
+      }),
+      new CreateUser({
+        loadUserByEmailRepository,
+        createUserRepository: {}
+      }),
+      new CreateUser({
+        loadUserByEmailRepository,
+        createUserRepository
+      })
+    )
+    for (const sut of suts) {
+      const promise = sut.createUser('any_email@mail.com', 'any_password')
+      expect(promise).rejects.toThrow()
+    }
   })
 })
