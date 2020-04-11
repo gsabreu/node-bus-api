@@ -1,5 +1,6 @@
 const HttpResponse = require('../helpers/http-response')
 const { MissingParamError, InvalidParamError } = require('../../utils/errors')
+const UserAlredyExists = require('../../domain/usescases/errors/user-alredy-exists-error')
 
 module.exports = class CreateUserRouter {
   constructor ({ createUser, emailValidator } = {}) {
@@ -19,8 +20,14 @@ module.exports = class CreateUserRouter {
       if (!password) {
         return HttpResponse.badRequest(new MissingParamError('password'))
       }
-      const user = await this.createUser.createUser(email, password)
-      return HttpResponse.ok({ user })
+      try {
+        const user = await this.createUser.createUser(email, password)
+        return HttpResponse.ok({ user })
+      } catch (e) {
+        if (e instanceof UserAlredyExists) {
+          return HttpResponse.badRequest(e.message)
+        }
+      }
     } catch (error) {
       return HttpResponse.serverError()
     }
