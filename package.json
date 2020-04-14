@@ -1,6 +1,6 @@
 {
   "name": "bus-node-api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "SPtrans bus API",
   "author": "Guilherme Abreu",
   "license": "ISC",
